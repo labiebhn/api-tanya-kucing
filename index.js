@@ -3,6 +3,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const multer = require('multer');
+const path = require('path');
 
 const app = express();
 const authRoutes = require('./src/routes/auth');
@@ -20,7 +21,7 @@ const fileStorage = multer.diskStorage({
 
 // FILTER TYPE OF FILES
 const fileFilter = (req, file, callback) => {
-  if(file.mimetype === 'image/png' || file.mimetype === 'image/jgp' || file.mimetype === 'image/jpeg') {
+  if(file.mimetype === 'image/png' || file.mimetype === 'image/jpg' || file.mimetype === 'image/jpeg') {
     callback(null, true);
   } else {
     callback(null, false);
@@ -29,7 +30,9 @@ const fileFilter = (req, file, callback) => {
 
 // SHORTCUT FOR GET BODY ON REQUEST CILENT
 app.use(bodyParser.json());
-// CATCHING FILE FROM MULTIPART FORM DATA
+// MAKE URL STATIC FOR ALLOWING CILENT ACCESS DIRECTORY PATH IMAGES
+app.use('/images', express.static(path.join(__dirname /* PATH FILE index.js */, 'images' /* FOLDER IMAGES */)));
+// CATCHING & SAVE FILE FROM MULTIPART FORM DATA
 app.use(multer({storage: fileStorage, fileFilter: fileFilter}).single('image' /* KEY */));
 
 // ALLOWING CILENT FOR ACCESSING API
